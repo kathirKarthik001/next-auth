@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { authSchema } from "@/lib/schema";
+import { loginSchema } from "@/lib/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -11,28 +11,32 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 import Link from "next/link";
+import { login } from "@/actions/auth";
 
 export default function SignInPage() {
   const [serverMessage, setServerMessage] = useState("");
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<z.infer<typeof authSchema>>({
-    resolver: zodResolver(authSchema),
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof authSchema>) => {
+  const onSubmit = (values: z.infer<typeof loginSchema>) => {
     setServerMessage("");
     startTransition(async () => {
       try {
-        // Replace this with your actual sign-in server action
-        console.log("SignIn called with:", values);
-        setServerMessage("Successfully signed in!"); // fake response
+        const data = await login( values );
+
+        if( data?.error ){
+          setServerMessage(data.error);
+        }
+
       } catch (error: any) {
-        setServerMessage("Invalid credentials or server error.");
+        setServerMessage(error.message);
       }
     });
   };
@@ -82,7 +86,7 @@ export default function SignInPage() {
       </Form>
 
       <div className="text-sm text-center">
-        Don’t have an account? <Link href={'/auth/sign-up'} className="text-blue-600 underline">Register</Link>
+        Don’t have an account? <Link href={'/auth/register'} className="text-blue-600 underline">Register</Link>
       </div>
 
       {/* Social Buttons */}

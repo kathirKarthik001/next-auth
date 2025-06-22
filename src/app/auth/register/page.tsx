@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { authSchema } from "@/lib/schema";
+import { registerSchema } from "@/lib/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -11,26 +11,37 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 import Link from "next/link";
+import { register } from "@/actions/auth";
 
 export default function SignUpPage() {
   const [serverMessage, setServerMessage] = useState("");
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<z.infer<typeof authSchema>>({
-    resolver: zodResolver(authSchema),
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
+      name:"",
       email: "",
       password: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof authSchema>) => {
+  const onSubmit = (values: z.infer<typeof registerSchema>) => {
     setServerMessage("");
     startTransition(async () => {
       try {
-        // Replace this with your actual signup server action
-        console.log("Register called with:", values);
-        setServerMessage("Verification email sent!");
+        
+        const message = await register( values );
+
+        if( message.error ){
+          setServerMessage(message.error);
+        }
+        if( message.success ){
+          setServerMessage( message.success );
+          form.reset();
+        }
+
+
       } catch (error: any) {
         setServerMessage("Registration failed. Try again.");
       }
@@ -43,6 +54,20 @@ export default function SignUpPage() {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+
+          {/* Email Field */}
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl><Input type="text" placeholder="kathir karthik M" {...field} /></FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           {/* Email Field */}
           <FormField
             control={form.control}
@@ -82,7 +107,7 @@ export default function SignUpPage() {
       </Form>
 
       <div className="text-sm text-center">
-        Already have an account? <Link href={'/auth/sign-in'} className="text-blue-600 underline">Sign In</Link>
+        Already have an account? <Link href={'/auth/login'} className="text-blue-600 underline">Sign In</Link>
       </div>
 
       {/* Social Buttons */}
