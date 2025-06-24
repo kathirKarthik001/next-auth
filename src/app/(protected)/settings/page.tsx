@@ -1,17 +1,27 @@
-"use client";
-
-import { signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { auth, signOut } from "@/auth";
 import { Button } from "@/components/ui/button";
 
+export default async function SettingsPage() {
 
-export default function LogoutButton() {
-  const router = useRouter();
+  const session =  await auth();
 
   const handleLogout = async () => {
-    await signOut();
-    router.push("/auth/login");
+      "use server"
+      await signOut({ 
+        redirect: true,
+        redirectTo:"/auth/login" 
+      });
   };
 
-  return <Button onClick={handleLogout}>Sign Out</Button>;
+  return (
+    <>
+      <div className="m-10">
+        { JSON.stringify( session , null , 3 ) }
+      </div>
+
+      <form action={handleLogout}>
+          <Button className="m-5 cursor-pointer" type="submit"> Log out</Button>
+      </form>
+    </>
+  )
 }
