@@ -6,6 +6,10 @@ import { getUserById } from "./actions/user";
 import { UserRole } from "./generated/prisma";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  pages:{
+    signIn: "/auth/login",
+    error: "/auth/error",
+  },
   events: {
     async linkAccount({ user }) {
       await prisma.user.update({

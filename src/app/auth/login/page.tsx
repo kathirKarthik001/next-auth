@@ -8,15 +8,17 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { FcGoogle } from "react-icons/fc";
-import { FaGithub } from "react-icons/fa";
 import Link from "next/link";
 import { login } from "@/actions/auth";
 import SocialProviders from "@/components/SocialProviders";
+import { useSearchParams } from "next/navigation";
 
 export default function SignInPage() {
   const [serverMessage, setServerMessage] = useState("");
   const [isPending, startTransition] = useTransition();
+
+  const searhParams = useSearchParams();
+  const error = searhParams.get("error") === "OAuthAccountNotLinked" ? "Wrong Social login" : "";
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -76,8 +78,14 @@ export default function SignInPage() {
 
           {/* Server Message */}
           {serverMessage && (
-            <p className="text-sm text-red-600">{serverMessage}</p>
+            <p className="text-sm text-center bg-red-100 font-bold text-red-600">{serverMessage}</p>
           )}
+
+          { 
+            error.length > 0 &&  ! serverMessage && (
+              <p className="text-sm text-center bg-red-100 font-bold text-red-600">{error}</p>
+            )
+          }
 
           {/* Submit Button */}
           <Button type="submit" disabled={isPending} className="w-full">
