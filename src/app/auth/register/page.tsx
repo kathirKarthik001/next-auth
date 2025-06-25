@@ -12,6 +12,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 import Link from "next/link";
 import { register } from "@/actions/auth";
+import SocialProviders from "@/components/SocialProviders";
 
 export default function SignUpPage() {
   const [serverMessage, setServerMessage] = useState("");
@@ -111,14 +112,8 @@ export default function SignUpPage() {
       </div>
 
       {/* Social Buttons */}
-      <div className="flex items-center gap-3 mt-4 ">
-        <Button variant="outline" className="w-1/2 flex items-center justify-center gap-2">
-          <FcGoogle size={20} /> Google
-        </Button>
-        <Button variant="outline" className="w-1/2  flex items-center justify-center gap-2">
-          <FaGithub size={20} /> GitHub
-        </Button>
-      </div>
+      <SocialProviders/>
+
     </div>
   );
 }
